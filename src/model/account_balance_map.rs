@@ -22,7 +22,7 @@ impl AccountBalanceMap {
         self.update_balance(recipient, balance+amount);
     }
 
-    pub fn transfer(&mut self, sender: &Address, amount: Amount,) -> Result<(), AccountBalanceMapError> {
+    pub fn transfer(&mut self, sender: &Address, recipient: &Address, amount: Amount,) -> Result<(), AccountBalanceMapError> {
         let sender_balance = self.get_sender_balance(sender)?;
         let recipient_balance = self.get_recipient_balance(recipient);
 

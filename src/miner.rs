@@ -94,7 +94,7 @@ impl Miner {
 
     // Creates binary data mask with the amount of left padding zeros indicated by the "difficulty" value
     // used to easily compose if a newly created block has a hash that matches the difficulty
-    fn create_target(difficulty: u32) -> BlockHash { BlockHash::Max >> difficulty }
+    fn create_target(difficulty: u32) -> BlockHash { BlockHash::MAX >> difficulty }
 
     // check if we have hit the limit of mined blocks (if the limit is set)
     fn must_stop_mining(&self, block_counter: u64) -> bool {
@@ -195,7 +195,7 @@ mod tests {
         let miner = create_miner(difficulty, max_nonce);
         let last_block = create_empty_block();
         let result = miner.mine_block(&last_block, &Vec::new());
-        assert_eq!(result.is_some());
+        assert!(result.is_some());
 
         // check that the block is valid
         let mined_block = result.unwrap();
@@ -296,7 +296,7 @@ mod tests {
         // the transaction is valid because the genesis block gives rewards to the miner address
         // so that address can be a sender of funds to other addresses
         let transaction = Transaction {
-            sender: miner_address();
+            sender: miner_address(),
             recipient: bob(),
             amount: 3,
         };

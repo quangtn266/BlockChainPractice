@@ -29,6 +29,9 @@ pub enum BlockchainError {
     #[error("Invalid difficulty")]
     InvalidDifficulty,
 
+    #[error("Invalid hash")]
+    InvalidHash,
+
     #[error("Coinbase transaction not found")]
     CoinbaseTransactionNotFound,
 
@@ -51,6 +54,8 @@ pub struct Blockchain{
 impl Blockchain {
     // Create a brand new blockchain with a genesis block
     pub fn new(difficulty: u32) -> Blockchain {
+        let genesis_block = Blockchain::create_genesis_block();
+
         // add the genesis block to the synced vec of blocks
         let blocks = vec![genesis_block];
         let synced_blocks = Arc::new(Mutex::new(blocks));
@@ -199,7 +204,6 @@ impl Blockchain {
 
 #[cfg(test)]
 mod tests {
-    use ethereum_types::Address;
     use crate::model::{
         account_balance_map::AccountBalanceMapError,
         test_util::{alice, bob, carol},
@@ -226,7 +230,7 @@ mod tests {
         assert_eq!(block.index, 0);
         assert_eq!(block.nonce, 0);
         assert_eq!(block.previous_hash, BlockHash::default());
-        assert!(block.transaction.is_empty());
+        assert!(block.transactions.is_empty());
     }
 
     #[test]
@@ -260,7 +264,7 @@ mod tests {
         assert!(result.is_ok());
 
         let blocks = blockchain.get_all_blocks();
-        assert_eq!(block.len(), 2);
+        assert_eq!(blocks.len(), 2);
 
         let last_block = blockchain.get_last_block();
         assert_eq!(last_block.hash, block.hash);
@@ -300,7 +304,7 @@ mod tests {
         // create a block with invalid hash
         let previous_hash = blockchain.get_last_block().hash;
         let mut block = Block::new(1, 0, previous_hash, Vec::new());
-        block.hash = BlockHash:default();
+        block.hash = BlockHash::default();
 
         // try adding the invalid block, it should return an error
         let result = blockchain.add_block(block.clone());
@@ -411,7 +415,7 @@ mod tests {
 
         // try adding the invalid block, it should return an error
         let result = blockchain.add_block(block.clone());
-        assert_balance_err(result, AccountBalanceError::SenderAccountDoesNotExist);
+        assert_balance_err(result, AccountBalanceMapError::SenderAccountDoesNotExist);
     }
 
     fn assert_err(result: Result<(), anyhow::Error>, error_type: BlockchainError) {

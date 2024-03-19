@@ -4,7 +4,7 @@ use std::sync::{Arc, Mutex};
 pub type TransactionVec = Vec<Transaction>;
 
 // We don't need to export this type because concurrency is encapsulated in this file
-type SyncedTransactionVec = Ard<Mutex<TransactionVec>>;
+type SyncedTransactionVec = Arc<Mutex<TransactionVec>>;
 
 // Represent a pool of unrealized transactions
 // Multiple threads can read/ write concurrently to the pool
@@ -65,6 +65,7 @@ mod tests {
 
         // add a new transaction to the pool
         let transaction = create_mock_transaction(1);
+        transaction_pool.add_transaction(transaction.clone());
 
         // pop the value and check the transaction is included
         let mut transactions = transaction_pool.pop();

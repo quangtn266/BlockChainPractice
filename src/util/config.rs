@@ -3,7 +3,6 @@ extern crate dotenv;
 use dotenv::dotenv;
 use std::env;
 use std::str::FromStr;
-use ethereum_types::Address;
 
 use crate::model::Address;
 

@@ -19,7 +19,7 @@ pub struct Block {
     pub nonce: u64,
     pub previous_hash: BlockHash,
     pub hash: BlockHash,
-    pub transaction: Vec<Transaction>,
+    pub transactions: Vec<Transaction>,
 }
 
 impl Block {
@@ -35,7 +35,7 @@ impl Block {
         let mut block = Block {
             index, timestamp: Utc::now().timestamp_millis(),
             nonce, previous_hash, hash: BlockHash::default(),
-            transaction,
+            transactions,
         };
 
         block.hash = block.calculate_hash();

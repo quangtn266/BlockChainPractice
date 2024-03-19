@@ -81,3 +81,15 @@ async fn add_block(state: web::Data<ApiState>, block_json: web::Json<Block>) -> 
         Err(error) => HttpResponse::BadRequest().body(error.to_string()),
     }
 }
+
+// Adds a new transaction to the pool, to be included on the next block
+async fn add_transaction(
+    state: web::Data<ApiState>,
+    transaction_json: web::Json<Transaction>,
+) -> impl Responder {
+    let transaction = transaction_json.into_inner();
+    let pool = &state.pool;
+    pool.add_transaction(transaction);
+
+    HttpResponse::Ok()
+}

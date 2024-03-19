@@ -3,8 +3,6 @@ use std::{
     fmt,
     str::FromStr,
 };
-use std::fmt::Formatter;
-use actix_web::body::MessageBody;
 
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
@@ -75,7 +73,6 @@ impl fmt::Display for Address {
 #[cfg(test)]
 pub mod test_util {
     use std::convert::TryFrom;
-    use std::ops::Add;
 
     use super::Address;
 
@@ -129,29 +126,29 @@ mod tests {
         assert_eq!(address.to_string(), hex_str.to_lowercase());
         let address_json = serde_json::to_value(address).unwrap();
         assert_eq!(address_json, serde_json::Value::String(hex_str.clone()));
+    }
 
-        #[test]
-        fn reject_too_short() {
-            // 31-byte string (62 hex chars)
-            let hex_str = "f780b958227ff0bf5795ede8f9f7eaac67e7e06666b043a400026cbd421ce2".to_string();
-            let err = Address::try_from(hex_str).unwrap();
-            assert_eq!(err, AddressError::InvalidLength);
-        }
+    #[test]
+    fn reject_too_short() {
+        // 31-byte string (62 hex chars)
+        let hex_str = "f780b958227ff0bf5795ede8f9f7eaac67e7e06666b043a400026cbd421ce2".to_string();
+        let err = Address::try_from(hex_str).unwrap_err();
+        assert_eq!(err, AddressError::InvalidLength);
+    }
 
-        #[test]
-        fn reject_too_long() {
-            // 33-byte string (66 hex chars)
-            let hex_str = "f780b958227ff0bf5795ede8f9f7eaac67e7e06666b043a400026cbd421ce28e10".to_string();
-            let err =Address::try_from(hex_str).unwrap_err();
-            assert_eq!(err, AddressError::InvalidLength);
-        }
+    #[test]
+    fn reject_too_long() {
+        // 33-byte string (66 hex chars)
+        let hex_str = "f780b958227ff0bf5795ede8f9f7eaac67e7e06666b043a400026cbd421ce28e10".to_string();
+        let err =Address::try_from(hex_str).unwrap_err();
+        assert_eq!(err, AddressError::InvalidLength);
+    }
 
-        #[test]
-        fn reject_invalid_characters() {
-            // correct length (32 bytes) but with an invalid hexadecimal char "g"
-            let hex_str = "g780b958227ff0bf5795ede8f9f7eaac67e7e06666b043a400026cbd421ce28e".to_string();
-            let err = Address::try_from(hex_str).unwrap_err();
-            assert_eq!(err, AddressError::InvalidFormat);
-        }
+    #[test]
+    fn reject_invalid_characters() {
+        // correct length (32 bytes) but with an invalid hexadecimal char "g"
+        let hex_str = "g780b958227ff0bf5795ede8f9f7eaac67e7e06666b043a400026cbd421ce28e".to_string();
+        let err = Address::try_from(hex_str).unwrap_err();
+        assert_eq!(err, AddressError::InvalidFormat);
     }
 }
